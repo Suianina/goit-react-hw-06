@@ -18,51 +18,35 @@ const ContactForm = () => {
   });
 
   const handleSubmit = (values, actions) => {
-    const isDuplicate = contacts.some(
-      contact => contact.name.toLowerCase() === values.name.toLowerCase()
-    );
-
-    if (isDuplicate) {
+    if (contacts.some(contact => contact.name.toLowerCase() === values.name.toLowerCase())) {
       alert(`${values.name} is already in contacts!`);
       return;
     }
 
-    dispatch(
-      addContact({
-        id: nanoid(),
-        name: values.name,
-        number: values.number,
-      })
-    );
+    dispatch(addContact({
+      id: nanoid(),
+      name: values.name,
+      number: values.number,
+    }));
     actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={{
-        id: '',
-        name: '',
-        number: '',
-      }}
+      initialValues={{ name: '', number: '' }}
       onSubmit={handleSubmit}
       validationSchema={ContactsSchema}
     >
       <Form className={css.form}>
-        <label className={css.name} htmlFor={nameFieldId}>
-          Name
-        </label>
+        <label className={css.name} htmlFor={nameFieldId}>Name</label>
         <Field className={css.field} type="text" name="name" id={nameFieldId} />
         <ErrorMessage className={css.error} name="name" component="span" />
 
-        <label className={css.name} htmlFor={numberFieldId}>
-          Number
-        </label>
+        <label className={css.name} htmlFor={numberFieldId}>Number</label>
         <Field className={css.field} type="text" name="number" id={numberFieldId} />
         <ErrorMessage className={css.error} name="number" component="span" />
 
-        <button className={css.btn} type="submit">
-          Add contact
-        </button>
+        <button className={css.btn} type="submit">Add contact</button>
       </Form>
     </Formik>
   );
