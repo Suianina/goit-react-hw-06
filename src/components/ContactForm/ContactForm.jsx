@@ -2,22 +2,38 @@ import css from './ContactForm.module.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { nanoid } from 'nanoid';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
 
-const ContactForm = ({ onAdd }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.items);
+
   const nameFieldId = nanoid();
   const numberFieldId = nanoid();
 
   const ContactsSchema = Yup.object().shape({
-    name: Yup.string().min(3, 'Too Short!').max(50, "Too Long!").required("Required"),
-    number: Yup.string().min(3, 'Too Short!').max(50, "Too Long!").required("Required")
+    name: Yup.string().min(3, 'Too Short!').max(50, 'Too Long!').required('Required'),
+    number: Yup.string().min(3, 'Too Short!').max(50, 'Too Long!').required('Required'),
   });
 
   const handleSubmit = (values, actions) => {
-    onAdd({
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    });
+    const isDuplicate = contacts.some(
+      contact => contact.name.toLowerCase() === values.name.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      alert(`${values.name} is already in contacts!`);
+      return;
+    }
+
+    dispatch(
+      addContact({
+        id: nanoid(),
+        name: values.name,
+        number: values.number,
+      })
+    );
     actions.resetForm();
   };
 
@@ -41,19 +57,15 @@ const ContactForm = ({ onAdd }) => {
         <label className={css.name} htmlFor={numberFieldId}>
           Number
         </label>
-        <Field
-          className={css.field}
-          type="text"
-          name="number"
-          id={numberFieldId}
-        />
+        <Field className={css.field} type="text" name="number" id={numberFieldId} />
         <ErrorMessage className={css.error} name="number" component="span" />
+
         <button className={css.btn} type="submit">
           Add contact
         </button>
       </Form>
     </Formik>
   );
-}
+};
 
 export default ContactForm;
